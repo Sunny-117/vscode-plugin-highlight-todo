@@ -13,14 +13,36 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('highlight-todo.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from highlight-todo!');
-	});
+	let disposable = vscode.workspace.onDidOpenTextDocument((document)=>{
+		console.log(document, 'document')
+		highlightTodos(document)
+	})
 
 	context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+function highlightTodos(document: vscode.TextDocument) {
+
+	const text = document.getText();
+    const todoRegex = /\/\/.*?(TODO|FIXME|XXX):/g;
+    const decorations: vscode.DecorationOptions[] = [];
+
+    let match;
+    while ((match = todoRegex.exec(text)) !== null) {
+        const startPos = document.positionAt(match.index);
+        const endPos = document.positionAt(match.index + match[0].length);
+
+        const decoration = {
+            range: new vscode.Range(startPos, endPos),
+            hoverMessage: 'Todo comment: ' + match[0],
+        };
+
+        decorations.push(decoration);
+    }
+
+    const decorationType = vscode.window.createTextEditorDecorationType({
+        backgroundColor: 'rgba(255, 255, 0, 0.2)',
+    });
+
+    vscode.window.activeTextEditor?.setDecorations(decorationType, decorations);
+}

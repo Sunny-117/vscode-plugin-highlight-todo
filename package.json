@@ -9,12 +9,13 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "publisher": "sunny-117",
+  "activationEvents": ["*"],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "highlight-todo.helloWorld",
+        "command": "todo",
         "title": "Hello World"
       }
     ]
